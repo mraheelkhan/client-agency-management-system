@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\V1\Auth\LoginUserController;
+use App\Http\Controllers\V1\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
-use App\Http\Controllers\V1\RegisterController;
-use \Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
-use \App\Http\Controllers\V1\LoginUserController;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use \App\Http\Controllers\V1\ClientController;
 /*
 |--------------------------------------------------------------------------
 | API V1 Routes
@@ -40,4 +41,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+Route::group(['middleware' => 'auth:sanctum'], function(){
+    Route::resource('/clients', ClientController::class);
 });

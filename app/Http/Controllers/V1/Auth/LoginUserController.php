@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\V1;
+namespace App\Http\Controllers\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\V1\GlobalApiResponse;
 use Illuminate\Http\Request;
+
 class LoginUserController extends Controller
 {
     use GlobalApiResponse;
@@ -17,15 +18,20 @@ class LoginUserController extends Controller
         $validator = $this->validateUser($request->all());
         if($validator->fails())
         {
-            return $this->errorResponse("Validation error(s).", $validator->messages(), 422);
+            return $this->errorResponse(
+                message: "Validation error(s).",
+                errors: $validator->messages(),
+                statusCode: 422);
         }
         $user = User::whereEmail($request->email)->first();
 
         if(!$user)
         {
-            return $this->successResponse(
-                data: null,
+            return $this->errorResponse(
                 message: 'User not found',
+                errors : [
+                    'user' => ["User email does not exists."],
+                ],
                 statusCode: 404
             );
         }
