@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\Passport;
 use App\Traits\V1\GlobalApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +21,7 @@ class ClientController extends Controller
         $data = Client::all();
         return $this->successResponse(
             data: $data,
-            message: 'Client retrieved successfully',
+            message: 'Clients retrieved successfully',
         );
     }
 
@@ -103,6 +104,29 @@ class ClientController extends Controller
         return $this->successResponse(
             data: null,
             message: 'Client delete successfully',
+        );
+    }
+
+    public function storePassport(Request $request, Client $client)
+    {
+        $validator = Validator::make($request->all(), [
+            'passport_number' => 'required|alpha_num|min:10|unique:passports',
+            'image' => 'required|file'
+        ]);
+        if($validator->fails())
+        {
+            return $this->errorResponse(
+              message: "Given data invalid",
+              errors: $validator->messages()
+            );
+        }
+        $passport = Passport::create($validator->validated() + [ 'client_id' => $client->id ]);
+
+        $passport->addMediaFromRequest('image')->toMediaCollection();
+        return $this->successResponse(
+            data: $passport,
+            message: 'Passport created successfully.',
+            statusCode: 201
         );
     }
 }

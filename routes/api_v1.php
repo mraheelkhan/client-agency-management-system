@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use \App\Http\Controllers\V1\ClientController;
+use \App\Http\Controllers\PassportController;
 /*
 |--------------------------------------------------------------------------
 | API V1 Routes
@@ -43,5 +44,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::group(['middleware' => 'auth:sanctum'], function(){
+    Route::get('/clients/{client}/passport/{passport}', [PassportController::class, 'show']);
+    Route::post('/clients/{client}/passport', [ClientController::class, 'storePassport']);
     Route::resource('/clients', ClientController::class);
 });
